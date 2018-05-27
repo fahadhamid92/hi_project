@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/fahad/Downloads/hi_project/Hi_Project/src/Node.c
+Util.h
+/home/fahad/Downloads/hi_project/Hi_Project/src/Util.h
+Node.h
+/home/fahad/Downloads/hi_project/Hi_Project/src/Node.h
+
+/home/fahad/Downloads/hi_project/Hi_Project/src/Node.h
+
+/home/fahad/Downloads/hi_project/Hi_Project/src/Trie.c
+Util.h
+/home/fahad/Downloads/hi_project/Hi_Project/src/Util.h
+Trie.h
+/home/fahad/Downloads/hi_project/Hi_Project/src/Trie.h
+
+/home/fahad/Downloads/hi_project/Hi_Project/src/Trie.h
+
+/home/fahad/Downloads/hi_project/Hi_Project/src/Util.c
+
+/home/fahad/Downloads/hi_project/Hi_Project/src/Util.h
+
