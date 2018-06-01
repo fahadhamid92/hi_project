@@ -15,32 +15,6 @@
 cv::Mat floodKillEdges(cv::Mat &mat);
 
 #pragma mark Visualization
-/*
-template<typename T> mglData *matToData(const cv::Mat &mat) {
-  mglData *data = new mglData(mat.cols,mat.rows);
-  for (int y = 0; y < mat.rows; ++y) {
-    const T *Mr = mat.ptr<T>(y);
-    for (int x = 0; x < mat.cols; ++x) {
-      data->Put(((mreal)Mr[x]),x,y);
-    }
-  }
-  return data;
-}
-
-void plotVecField(const cv::Mat &gradientX, const cv::Mat &gradientY, const cv::Mat &img) {
-  mglData *xData = matToData<double>(gradientX);
-  mglData *yData = matToData<double>(gradientY);
-  mglData *imgData = matToData<float>(img);
-  
-  mglGraph gr(0,gradientX.cols * 20, gradientY.rows * 20);
-  gr.Vect(*xData, *yData);
-  gr.Mesh(*imgData);
-  gr.WriteFrame("vecField.png");
-  
-  delete xData;
-  delete yData;
-  delete imgData;
-}*/
 
 #pragma mark Helpers
 
@@ -111,14 +85,8 @@ cv::Point findEyeCenter(cv::Mat face, cv::Rect eye, std::string debugWindow) {
   //-- Find the gradient
   cv::Mat gradientX = computeMatXGradient(eyeROI);
   cv::Mat gradientY = computeMatXGradient(eyeROI.t()).t();
-  //-- Normalize and threshold the gradient
-  // compute all the magnitudes
   cv::Mat mags = matrixMagnitude(gradientX, gradientY);
-  //compute the threshold
   double gradientThresh = computeDynamicThreshold(mags, kGradientThreshold);
-  //double gradientThresh = kGradientThreshold;
-  //double gradientThresh = 0;
-  //normalize
   for (int y = 0; y < eyeROI.rows; ++y) {
     double *Xr = gradientX.ptr<double>(y), *Yr = gradientY.ptr<double>(y);
     const double *Mr = mags.ptr<double>(y);
@@ -144,14 +112,7 @@ cv::Point findEyeCenter(cv::Mat face, cv::Rect eye, std::string debugWindow) {
       row[x] = (255 - row[x]);
     }
   }
-  //imshow(debugWindow,weight);
-  //-- Run the algorithm!
   cv::Mat outSum = cv::Mat::zeros(eyeROI.rows,eyeROI.cols,CV_64F);
-  // for each possible gradient location
-  // Note: these loops are reversed from the way the paper does them
-  // it evaluates every possible center for each gradient location instead of
-  // every possible gradient location for every center.
-  //printf("Eye Size: %ix%i\n",outSum.cols,outSum.rows);
   for (int y = 0; y < weight.rows; ++y) {
     const double *Xr = gradientX.ptr<double>(y), *Yr = gradientY.ptr<double>(y);
     for (int x = 0; x < weight.cols; ++x) {
@@ -178,13 +139,8 @@ cv::Point findEyeCenter(cv::Mat face, cv::Rect eye, std::string debugWindow) {
     double floodThresh = maxVal * kPostProcessThreshold;
     cv::threshold(out, floodClone, floodThresh, 0.0f, cv::THRESH_TOZERO);
     if(kPlotVectorField) {
-      //plotVecField(gradientX, gradientY, floodClone);
-      imwrite("eyeFrame.png",eyeROIUnscaled);
     }
     cv::Mat mask = floodKillEdges(floodClone);
-    //imshow(debugWindow + " Mask",mask);
-    //imshow(debugWindow,out);
-    // redo max
     cv::minMaxLoc(out, NULL,&maxVal,NULL,&maxP,mask);
   }
   return unscalePoint(maxP,eye);
@@ -209,7 +165,6 @@ cv::Mat floodKillEdges(cv::Mat &mat) {
     if (mat.at<float>(p) == 0.0f) {
       continue;
     }
-    // add in every direction
     cv::Point np(p.x + 1, p.y); // right
     if (floodShouldPushPoint(np, mat)) toDo.push(np);
     np.x = p.x - 1; np.y = p.y; // left
@@ -218,7 +173,6 @@ cv::Mat floodKillEdges(cv::Mat &mat) {
     if (floodShouldPushPoint(np, mat)) toDo.push(np);
     np.x = p.x; np.y = p.y - 1; // up
     if (floodShouldPushPoint(np, mat)) toDo.push(np);
-    // kill it
     mat.at<float>(p) = 0.0f;
     mask.at<uchar>(p) = 0;
   }

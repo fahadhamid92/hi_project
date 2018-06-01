@@ -30,10 +30,6 @@ Node * search(char * keySeq, Node * root) {
   Node * current = root;
   int len = strlen(keySeq) - 1;
   int i = 0;
-  // Cases:
-  // 1. key length shorter than trie height
-  // 2. key length longer than trie heigh
-  // 3. # symbol termination
   while (i < len && current && keySeq[i] != '#') {
     int childIndex = keySeq[i] - '0' - 2;
     if (childIndex < 0 || !isdigit(keySeq[i])) {
@@ -45,21 +41,15 @@ Node * search(char * keySeq, Node * root) {
   return current;
 }
 
-// Inserts the given word to trie specified by the root.
-// Does not modify existing common prefix path.
-// e.g. Inserting 'ab' and 'abc' add 3 nodes in total because
-// 'ab' is common prefix.
 void insert(Node * root, char * word) {
   Node * current = root;
   int wordIndex = 0;
 
-  // insert a word into the trie
   while (*(word + wordIndex)) {
     char letter = word[wordIndex];
     int childIndex = getChildIndex(letter);
 
     Node * child = current->children[childIndex];
-    // make new node if there's no child at this index
     if (!child) {
       child = makeNode();
       current->children[childIndex] = child;
@@ -67,9 +57,6 @@ void insert(Node * root, char * word) {
     current = child;
     wordIndex++;
   }
-  // create a linked list when word(s) with the
-  // same sequence already exists
-  // -> append a node
   if (current->word) {
     Node * temp = current;
     while (temp && temp->next) {
@@ -84,9 +71,6 @@ void insert(Node * root, char * word) {
   current->word = (char *) mallocVerif(len);
   strncpy(current->word, word, len);
 }
-
-// Builds trie with words in the specified file.
-// Prints error message if it's not a valid file.
 Node * build(FILE * fp) {
   char * word;
   Node * root;
@@ -116,12 +100,9 @@ int getChildIndex(char letter) {
           5, 5, 5, 5, 5, 5, 5,
   };
   int i = letter - 'a';
-  // subtract 2 because 0 and 1 are reserved for
-  // space and set of special characters
   return chMap[i] - 2;
 }
 
-// Clears/frees the given node and its children.
 void clear(Node * root) {
   if (root) {
     int i;
@@ -133,7 +114,6 @@ void clear(Node * root) {
   }
 }
 
-// Frees the linked list of node with the given front
 void freeList(Node * front) {
   while (front) {
     Node * next = front->next;
@@ -142,7 +122,6 @@ void freeList(Node * front) {
   }
 }
 
-// Frees a node referenced by the given node pointer
 void freeNode(Node * node) {
   // free(NULL) is safe
   free(node->word);
@@ -150,8 +129,6 @@ void freeNode(Node * node) {
   free(node);
 }
 
-// Prints the given trie in preorder
-// For debugging
 void printTrie(Node * root, int level) {
   if (root) {
     if (root->word != NULL) {
@@ -184,9 +161,6 @@ void printTabs(int numTabs) {
   }
 }
 
-
-// Allocated 'size' memory to heap and verifies the result.
-// If malloc fails, then program exits with error message.
 void * mallocVerif(size_t size) {
   void * ptr = malloc(size);
   if (!ptr) {
